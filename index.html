@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>AI课代表 · 作业管家</title>
-<meta name="description" content="AI课代表 · 粘贴老师作业自动识别DDL，日历提醒不漏交，小组分工不混乱">
+<title>Task Tamer · Homework Manager</title>
+<meta name="description" content="Task Tamer · Paste your teacher's homework, auto-detect every deadline, get reminders so nothing slips, and keep group work organized.">
 <meta name="theme-color" content="#5B6CF6">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="AI课代表">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+<meta name="apple-mobile-web-app-title" content="Task Tamer">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='15' fill='%235B6CF6'/><path d='M17 33 L28 44 L47 21' fill='none' stroke='%23ffffff' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/></svg>">
 <script src="https://unpkg.com/vue@3.5.13/dist/vue.global.prod.js"></script>
 <style>
   :root{
@@ -33,11 +33,12 @@
   .fade-enter-active,.fade-leave-active{transition:opacity .18s;}
   .fade-enter-from,.fade-leave-to{opacity:0;}
 
-  /* ========== 登录页 ========== */
+  /* ========== Login ========== */
   .login{flex:1;display:flex;flex-direction:column;color:#fff;
     background:radial-gradient(130% 80% at 50% 0%,#7B86FF 0%,#5B6CF6 45%,#4A5AE0 100%);
     padding:84px 30px 36px;}
-  .login .logo{font-size:60px;text-align:center;filter:drop-shadow(0 10px 24px rgba(0,0,0,.25));}
+  .login .logo{display:flex;justify-content:center;filter:drop-shadow(0 14px 30px rgba(0,0,0,.28));}
+  .login .logo .lb{width:98px;height:98px;border-radius:27px;background:linear-gradient(158deg,#F3F4FF 0%,#FFFFFF 70%);display:flex;align-items:center;justify-content:center;}
   .login h1{text-align:center;font-size:30px;font-weight:850;letter-spacing:1px;margin-top:14px;}
   .login .slogan{text-align:center;font-size:14px;opacity:.86;margin-top:10px;line-height:1.6;}
   .login .panel{margin-top:48px;background:#fff;border-radius:24px;padding:26px 22px 24px;
@@ -57,7 +58,7 @@
   .login .enter:disabled{opacity:.45;box-shadow:none;}
   .login .foot{text-align:center;font-size:11.5px;opacity:.7;margin-top:auto;padding-top:30px;}
 
-  /* ========== 主框架 ========== */
+  /* ========== App shell ========== */
   .topbar{height:48px;display:flex;align-items:center;justify-content:center;position:sticky;top:0;z-index:30;
     background:rgba(244,245,250,.86);backdrop-filter:blur(10px);font-size:16px;font-weight:800;
     border-bottom:1px solid var(--line);}
@@ -130,7 +131,7 @@
   .result-card .rhead .idx{font-size:12px;color:var(--sub);font-weight:700;}
   .result-card .del{font-size:13px;color:var(--red);font-weight:700;}
   .field{display:flex;align-items:center;gap:10px;margin-top:9px;}
-  .field .fl{font-size:12px;color:var(--sub);width:42px;flex-shrink:0;font-weight:600;}
+  .field .fl{font-size:12px;color:var(--sub);width:58px;flex-shrink:0;font-weight:600;}
   .field input,.field select{flex:1;background:var(--bg);border-radius:10px;padding:9px 11px;font-size:14px;font-weight:600;}
 
   /* ===== group page ===== */
@@ -202,65 +203,79 @@
 <div id="app">
 <div class="phone">
 
-  <!-- ============ 登录页 ============ -->
+  <!-- ============ Login ============ -->
   <div class="login" v-if="screen==='login'">
-    <div class="logo">📚</div>
-    <h1>AI课代表</h1>
-    <div class="slogan">复制老师的作业，自动整理 DDL<br>提醒不漏交 · 小组分工不混乱</div>
+    <div class="logo"><span class="lb"><svg viewBox="0 0 64 64" width="62" height="62" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect x="12" y="14" width="40" height="34" rx="6.5" fill="#fff" stroke="#D9DCE8" stroke-width="1.6"/>
+      <path d="M12 22 V20.5 a6.5 6.5 0 0 1 6.5 -6.5 h27 a6.5 6.5 0 0 1 6.5 6.5 V22 Z" fill="#EF4444"/>
+      <rect x="23.5" y="10" width="3" height="8.5" rx="1.5" fill="#BC3636"/>
+      <rect x="37.5" y="10" width="3" height="8.5" rx="1.5" fill="#BC3636"/>
+      <text x="27" y="43" font-family="'Arial Black','Arial',sans-serif" font-size="20" font-weight="900" fill="#EF4444" text-anchor="middle">8</text>
+      <g stroke="#2E3650" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M8.8 40 l3.6 -2.3"/><path d="M21.2 40 l-3.6 -2.3"/>
+        <circle cx="15" cy="46" r="7" fill="#fff"/>
+        <path d="M10.8 52.7 l-1.7 2.3"/><path d="M19.2 52.7 l1.7 2.3"/>
+        <path d="M15 46 V42.4 M15 46 l2.5 1.4" stroke-width="1.6"/>
+      </g>
+      <circle cx="15" cy="46" r="1" fill="#2E3650"/>
+      <path d="M33 38 L40 46 L53 25" stroke="#34C759" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg></span></div>
+    <h1>Task Tamer</h1>
+    <div class="slogan">Paste your teacher's homework — AI sorts every deadline<br>Reminders so nothing slips · group work, organized</div>
     <div class="panel">
-      <div class="label">你的昵称</div>
-      <input class="name-input" v-model="loginName" placeholder="例如：小林" maxlength="10">
-      <div class="label" style="margin-top:20px">我是…</div>
+      <div class="label">Your nickname</div>
+      <input class="name-input" v-model="loginName" placeholder="e.g. Alex" maxlength="16">
+      <div class="label" style="margin-top:20px">I am…</div>
       <div class="role-row">
         <div class="role-card" :class="{on:loginRole==='student'}" @click="loginRole='student'">
-          <div class="emo">🎒</div><div class="rt">学生</div><div class="rd">记作业·管小组</div>
+          <div class="emo">🎒</div><div class="rt">Student</div><div class="rd">Track homework · groups</div>
         </div>
         <div class="role-card" :class="{on:loginRole==='parent'}" @click="loginRole='parent'">
-          <div class="emo">👨‍👩‍👧</div><div class="rt">家长</div><div class="rd">查看孩子作业</div>
+          <div class="emo">👨‍👩‍👧</div><div class="rt">Parent</div><div class="rd">View your kid's work</div>
         </div>
       </div>
-      <button class="enter" :disabled="!loginName||!loginRole" @click="doLogin">进入 AI课代表</button>
+      <button class="enter" :disabled="!loginName||!loginRole" @click="doLogin">Enter Task Tamer</button>
     </div>
-    <div class="foot">本地保存 · 数据不上传 · 仅供学习演示</div>
+    <div class="foot">Saved on-device · nothing uploaded · demo only</div>
   </div>
 
-  <!-- ============ 主框架 ============ -->
+  <!-- ============ App shell ============ -->
   <template v-else>
     <div class="topbar">
       {{ tabTitle }}
-      <span class="role-tag">{{ isParent ? '家长视角' : '学生' }}</span>
+      <span class="role-tag">{{ isParent ? 'Parent view' : 'Student' }}</span>
     </div>
 
     <div class="body">
 
-      <!-- ===== 首页 ===== -->
+      <!-- ===== Home ===== -->
       <div v-if="tab==='home'">
         <div class="hello">
-          <div class="hi">{{ greeting }}，{{ user.name }} 👋</div>
+          <div class="hi">{{ greeting }}, {{ user.name }} 👋</div>
           <div class="date">{{ todayText }}</div>
-          <div class="tip" v-if="!isParent">📌 今天有 {{ todayCount }} 项作业要交</div>
-          <div class="tip" v-else>👀 正在查看 {{ childName }} 的作业安排</div>
+          <div class="tip" v-if="!isParent">📌 {{ todayCount }} {{ todayCount===1?'task':'tasks' }} due today</div>
+          <div class="tip" v-else>👀 Viewing {{ childName }}'s schedule</div>
         </div>
 
         <div class="stats">
-          <div class="stat c-amber"><div class="n">{{ stat.today }}</div><div class="l">今日待交</div></div>
-          <div class="stat c-blue"><div class="n">{{ stat.week }}</div><div class="l">本周作业</div></div>
-          <div class="stat c-green"><div class="n">{{ stat.done }}</div><div class="l">已完成</div></div>
-          <div class="stat c-red"><div class="n">{{ stat.overdue }}</div><div class="l">已逾期</div></div>
+          <div class="stat c-amber"><div class="n">{{ stat.today }}</div><div class="l">Due today</div></div>
+          <div class="stat c-blue"><div class="n">{{ stat.week }}</div><div class="l">This week</div></div>
+          <div class="stat c-green"><div class="n">{{ stat.done }}</div><div class="l">Done</div></div>
+          <div class="stat c-red"><div class="n">{{ stat.overdue }}</div><div class="l">Overdue</div></div>
         </div>
 
-        <div class="sec-title"><div class="t">📋 待办作业</div></div>
+        <div class="sec-title"><div class="t">📋 To-do</div></div>
 
         <div v-if="sortedTasks.length===0" class="empty">
           <div class="e">🗒️</div>
-          <div class="et">还没有作业<br>{{ isParent ? '等孩子录入后这里会显示' : '把老师发的作业粘进来，自动整理' }}</div>
+          <div class="et">No homework yet<br>{{ isParent ? "It'll show up once your kid adds some" : 'Paste what your teacher posted to auto-sort it' }}</div>
         </div>
 
         <div v-for="t in sortedTasks" :key="t.id" class="tcard" :class="{overdue:isOverdue(t)&&!t.done, done:t.done}">
           <div class="check" :class="{on:t.done}" @click="!isParent && toggleDone(t)">{{ t.done ? '✓' : '' }}</div>
           <div class="main">
             <div class="row1">
-              <span class="pill" :style="pillStyle(t.subject)">{{ t.subject||'其他' }}</span>
+              <span class="pill" :style="pillStyle(t.subject)">{{ t.subject||'Other' }}</span>
               <span class="ct">{{ t.content }}</span>
             </div>
             <div class="meta">
@@ -270,64 +285,64 @@
           </div>
         </div>
 
-        <button v-if="!isParent" class="cta" @click="tab='scan'" style="margin-top:8px">📋 粘贴作业，一键识别</button>
+        <button v-if="!isParent" class="cta" @click="tab='scan'" style="margin-top:8px">📋 Paste homework · auto-detect</button>
       </div>
 
-      <!-- ===== 识别页 ===== -->
+      <!-- ===== Detect ===== -->
       <div v-if="tab==='scan'">
-        <div class="page-h">✨ 智能识别</div>
-        <div class="page-sub">复制老师在群里发的作业消息，粘贴到下面，自动提取科目、内容和截止时间。</div>
+        <div class="page-h">✨ Smart Detect</div>
+        <div class="page-sub">Paste the homework message your teacher sent — we'll pull out the subject, task and deadline automatically.</div>
         <div class="scan-box">
-          <textarea v-model="scanInput" placeholder="把老师布置的作业粘到这里…
-例如：今天数学试卷第3-5页，明天早读前交，记得拍照发群。"></textarea>
+          <textarea v-model="scanInput" placeholder="Paste your teacher's homework here…
+e.g. Math worksheet pages 3-5, due tomorrow before class. Take a photo and send it to the group."></textarea>
           <div class="scan-actions">
-            <button class="btn-sm" @click="fillSample">试试示例</button>
-            <button class="btn-sm" v-if="scanInput" @click="scanInput='';scanResults=[]">清空</button>
-            <button class="cta" style="flex:1;margin:0;padding:12px" @click="doScan">✨ 一键识别</button>
+            <button class="btn-sm" @click="fillSample">Try sample</button>
+            <button class="btn-sm" v-if="scanInput" @click="scanInput='';scanResults=[]">Clear</button>
+            <button class="cta" style="flex:1;margin:0;padding:12px" @click="doScan">✨ Detect</button>
           </div>
         </div>
 
         <template v-if="scanResults.length">
-          <div class="sec-title"><div class="t">识别到 {{ scanResults.length }} 条，请确认</div></div>
+          <div class="sec-title"><div class="t">Found {{ scanResults.length }} — please confirm</div></div>
           <div v-for="(r,i) in scanResults" :key="r.id" class="result-card">
             <div class="rhead">
-              <span class="idx">第 {{ i+1 }} 条</span>
-              <span class="del" @click="scanResults.splice(i,1)">删除</span>
+              <span class="idx">#{{ i+1 }}</span>
+              <span class="del" @click="scanResults.splice(i,1)">Delete</span>
             </div>
-            <div class="field"><span class="fl">科目</span>
+            <div class="field"><span class="fl">Subject</span>
               <select v-model="r.subject"><option v-for="s in subjectList" :value="s">{{ s }}</option></select>
             </div>
-            <div class="field"><span class="fl">内容</span><input v-model="r.content" placeholder="作业内容"></div>
-            <div class="field"><span class="fl">截止</span><input type="datetime-local" v-model="r.deadline"></div>
-            <div class="field"><span class="fl">要求</span><input v-model="r.submit" placeholder="如：拍照发群（可空）"></div>
+            <div class="field"><span class="fl">Task</span><input v-model="r.content" placeholder="Homework"></div>
+            <div class="field"><span class="fl">Due</span><input type="datetime-local" v-model="r.deadline"></div>
+            <div class="field"><span class="fl">Submit</span><input v-model="r.submit" placeholder="e.g. photo to group (optional)"></div>
           </div>
-          <button class="cta" @click="confirmScan">✅ 确认，加入 {{ scanResults.length }} 条到日历</button>
+          <button class="cta" @click="confirmScan">✅ Confirm · add {{ scanResults.length }} to calendar</button>
         </template>
-        <div v-else-if="scanned" class="empty"><div class="e">🤔</div><div class="et">没识别出作业，换一段文字试试</div></div>
+        <div v-else-if="scanned" class="empty"><div class="e">🤔</div><div class="et">Nothing detected — try a different message</div></div>
       </div>
 
-      <!-- ===== 小组页 ===== -->
+      <!-- ===== Group ===== -->
       <div v-if="tab==='group'">
-        <div class="readonly-banner" v-if="isParent">🔒 家长视角为只读，不能修改进度</div>
-        <div class="sec-title"><div class="t">👥 小组任务</div>
-          <div class="more" v-if="!isParent" @click="openGroupSheet()">+ 新建</div>
+        <div class="readonly-banner" v-if="isParent">🔒 Parent view is read-only</div>
+        <div class="sec-title"><div class="t">👥 Group tasks</div>
+          <div class="more" v-if="!isParent" @click="openGroupSheet()">+ New</div>
         </div>
 
         <div v-if="groups.length===0" class="empty">
-          <div class="e">🧩</div><div class="et">还没有小组任务<br>{{ isParent ? '' : '点右上角「新建」，给组员分配任务' }}</div>
+          <div class="e">🧩</div><div class="et">No group tasks yet<br>{{ isParent ? '' : "Tap 'New' to assign tasks to members" }}</div>
         </div>
 
         <div v-for="g in groups" :key="g.id" class="gcard">
           <div class="gtitle">{{ g.title }}</div>
-          <div class="gdl">🎯 总截止：{{ formatDate(g.deadline) }}　·　{{ g.subtasks.length }} 个分工</div>
+          <div class="gdl">🎯 Due {{ formatDate(g.deadline) }} · {{ g.subtasks.length }} parts</div>
           <div class="prog"><div class="bar" :style="{width: groupProgress(g)+'%'}"></div></div>
           <div class="prog-label">
-            <span>整体进度</span>
-            <span>{{ doneCount(g) }}/{{ g.subtasks.length }} 完成 · {{ groupProgress(g) }}%</span>
+            <span>Progress</span>
+            <span>{{ doneCount(g) }}/{{ g.subtasks.length }} done · {{ groupProgress(g) }}%</span>
           </div>
           <div class="sub-list">
             <div v-for="st in g.subtasks" :key="st.id" class="sub-item">
-              <div class="avatar" :style="{background:avatarColor(st.owner)}">{{ st.owner.slice(-2) }}</div>
+              <div class="avatar" :style="{background:avatarColor(st.owner)}">{{ initials(st.owner) }}</div>
               <div class="si-main">
                 <div class="si-owner">{{ st.owner }}</div>
                 <div class="si-task">{{ st.content }} · {{ formatDate(st.deadline) }}</div>
@@ -340,58 +355,58 @@
         </div>
       </div>
 
-      <!-- ===== 我的页 ===== -->
+      <!-- ===== Me ===== -->
       <div v-if="tab==='me'">
         <div class="me-head">
           <div class="me-avatar">{{ user.name.slice(0,1) }}</div>
           <div>
             <div class="me-name">{{ user.name }}</div>
-            <div class="me-role">{{ isParent ? '家长账号 · 查看模式' : '学生账号' }}</div>
+            <div class="me-role">{{ isParent ? 'Parent · view mode' : 'Student account' }}</div>
           </div>
         </div>
         <div class="me-list">
-          <div class="me-row" @click="switchRole"><span class="ic">🔄</span>切换身份（{{ isParent?'切到学生':'切到家长' }}）<span class="arr">›</span></div>
-          <div class="me-row"><span class="ic">🔔</span>提醒：截止前 1 天 + 2 小时<span class="arr">›</span></div>
-          <div class="me-row"><span class="ic">ℹ️</span>关于 AI课代表<span class="arr">›</span></div>
-          <div class="me-row danger" @click="resetAll"><span class="ic">🗑️</span>清空所有数据<span class="arr">›</span></div>
+          <div class="me-row" @click="switchRole"><span class="ic">🔄</span>Switch role (to {{ isParent?'Student':'Parent' }})<span class="arr">›</span></div>
+          <div class="me-row"><span class="ic">🔔</span>Reminders: 1 day + 2 hours before<span class="arr">›</span></div>
+          <div class="me-row"><span class="ic">ℹ️</span>About Task Tamer<span class="arr">›</span></div>
+          <div class="me-row danger" @click="resetAll"><span class="ic">🗑️</span>Clear all data<span class="arr">›</span></div>
         </div>
-        <div class="ver">AI课代表 V1.0 · 本地演示版</div>
+        <div class="ver">Task Tamer v1.0 · local demo</div>
       </div>
 
     </div>
 
-    <!-- ===== 底部 tab ===== -->
+    <!-- ===== Bottom tab ===== -->
     <div class="tabbar">
-      <div class="tab" :class="{on:tab==='home'}" @click="tab='home'"><div class="ti">🏠</div>首页</div>
-      <div class="tab" v-if="!isParent" :class="{on:tab==='scan'}" @click="tab='scan'"><div class="ti">✨</div>识别</div>
-      <div class="tab" :class="{on:tab==='group'}" @click="tab='group'"><div class="ti">👥</div>小组</div>
-      <div class="tab" :class="{on:tab==='me'}" @click="tab='me'"><div class="ti">🙋</div>我的</div>
+      <div class="tab" :class="{on:tab==='home'}" @click="tab='home'"><div class="ti">🏠</div>Home</div>
+      <div class="tab" v-if="!isParent" :class="{on:tab==='scan'}" @click="tab='scan'"><div class="ti">✨</div>Detect</div>
+      <div class="tab" :class="{on:tab==='group'}" @click="tab='group'"><div class="ti">👥</div>Group</div>
+      <div class="tab" :class="{on:tab==='me'}" @click="tab='me'"><div class="ti">🙋</div>Me</div>
     </div>
 
-    <!-- ===== 新建小组任务弹层 ===== -->
+    <!-- ===== New group task sheet ===== -->
     <div class="mask" v-if="showGroupSheet" @click.self="showGroupSheet=false">
       <div class="sheet">
-        <h3>新建小组任务</h3>
-        <div class="label">任务名称</div>
-        <input v-model="gForm.title" placeholder="如：历史小组PPT《丝绸之路》">
-        <div class="label">总截止时间</div>
+        <h3>New group task</h3>
+        <div class="label">Task name</div>
+        <input v-model="gForm.title" placeholder="e.g. History group PPT: The Silk Road">
+        <div class="label">Final deadline</div>
         <input type="date" v-model="gForm.deadline">
-        <div class="label">参与成员（点击选择，第一个默认是你）</div>
+        <div class="label">Members (tap to select; first one is you)</div>
         <div class="members-pick">
           <span v-for="m in memberPool" :key="m" class="mpick" :class="{on:gForm.members.includes(m)}" @click="toggleMember(m)">{{ m }}</span>
         </div>
-        <div class="label">分工（给成员分配子任务）</div>
+        <div class="label">Assignments (give each member a part)</div>
         <div class="sub-edit" v-for="(s,i) in gForm.subtasks" :key="i">
           <div class="se-row">
-            <select v-model="s.owner" style="flex:0 0 90px;background:#fff;border-radius:10px;padding:10px">
+            <select v-model="s.owner" style="flex:0 0 104px;background:#fff;border-radius:10px;padding:10px">
               <option v-for="m in gForm.members" :value="m">{{ m }}</option>
             </select>
-            <input v-model="s.content" placeholder="子任务内容">
+            <input v-model="s.content" placeholder="Subtask">
           </div>
           <input type="date" v-model="s.deadline" style="margin-top:8px">
         </div>
-        <div class="add-sub" @click="addSub">+ 添加一条分工</div>
-        <button class="cta" style="margin-top:20px" @click="saveGroup">创建小组任务</button>
+        <div class="add-sub" @click="addSub">+ Add assignment</div>
+        <button class="cta" style="margin-top:20px" @click="saveGroup">Create group task</button>
       </div>
     </div>
   </template>
@@ -402,75 +417,152 @@
 <script>
 const { createApp, ref, reactive, computed, watch, onMounted } = Vue;
 
-const STORE_KEY = 'classrep_state_v1';
-const SUBJECTS = ['语文','数学','英语','物理','化学','生物','政治','历史','地理','道德与法治','道法','科学','体育','音乐','美术','信息技术','信息'];
-const SUBJECT_ALIAS = {'道法':'道德与法治','信息':'信息技术'};
-const SUBJECT_COLORS = {
-  '语文':['#FDECEC','#E5484D'],'数学':['#E9F0FF','#3B6FF6'],'英语':['#E8F8F0','#1A9E5B'],
-  '物理':['#EEF0FE','#5B6CF6'],'化学':['#FFF3E6','#E8852B'],'生物':['#E8F8F0','#0E9E6E'],
-  '政治':['#FDEFF6','#D6469A'],'历史':['#F3EEFB','#8B5CF6'],'地理':['#E6F7F8','#0E9AA7'],
-  '道德与法治':['#FDEFF6','#D6469A'],'科学':['#E8F8F0','#0E9E6E'],'体育':['#FFF0EC','#F4612B'],
-  '音乐':['#F3EEFB','#8B5CF6'],'美术':['#FFF3E6','#E8852B'],'信息技术':['#E9F0FF','#3B6FF6'],
-  '其他':['#EEF0F4','#6B7280']
-};
-const TASK_NOUNS = ['试卷','卷子','习题','练习册','练习','作业本','背诵','默写','听写','作文','周记','日记','报告','调查','手抄报','PPT','ppt','演讲','朗读','预习','复习','口算','计算','单词','课文','古诗','文言文','阅读','题','页','章节','单元','实验','绘画','视频','录音','导学案','学案','笔记'];
-const SUBMIT_KW = ['拍照发群','拍照上传','拍照','照片','纸质上交','纸质','上交','交到','交给','打印','提交','默写','听写','打卡','发群','发到群','钉钉','微信','在线提交','网课'];
+const STORE_KEY = 'tasktamer_state_v1';
+
+// Each subject: canonical English name + pill colors + keywords (English & Chinese)
+const SUBJECT_DEFS = [
+  {name:'Math',      color:['#E9F0FF','#3B6FF6'], kw:['math','maths','mathematics','algebra','geometry','calculus','数学']},
+  {name:'English',   color:['#E8F8F0','#1A9E5B'], kw:['english','英语']},
+  {name:'Chinese',   color:['#FDECEC','#E5484D'], kw:['chinese','mandarin','语文']},
+  {name:'Physics',   color:['#EEF0FE','#5B6CF6'], kw:['physics','物理']},
+  {name:'Chemistry', color:['#FFF3E6','#E8852B'], kw:['chemistry','化学']},
+  {name:'Biology',   color:['#E8F8F0','#0E9E6E'], kw:['biology','bio','生物']},
+  {name:'History',   color:['#F3EEFB','#8B5CF6'], kw:['history','历史']},
+  {name:'Geography', color:['#E6F7F8','#0E9AA7'], kw:['geography','geo','地理']},
+  {name:'Politics',  color:['#FDEFF6','#D6469A'], kw:['politics','political','civics','政治','道德与法治','道法']},
+  {name:'Science',   color:['#E8F8F0','#0E9E6E'], kw:['science','科学']},
+  {name:'P.E.',      color:['#FFF0EC','#F4612B'], kw:['physical education','gym','体育']},
+  {name:'Music',     color:['#F3EEFB','#8B5CF6'], kw:['music','音乐']},
+  {name:'Art',       color:['#FFF3E6','#E8852B'], kw:['art','drawing','美术']},
+  {name:'IT',        color:['#E9F0FF','#3B6FF6'], kw:['computer science','computing','informatics','信息技术','信息']},
+];
+const SUBJECT_COLORS = {};
+SUBJECT_DEFS.forEach(d=>{ SUBJECT_COLORS[d.name]=d.color; });
+SUBJECT_COLORS['Other'] = ['#EEF0F4','#6B7280'];
+
+const TASK_NOUNS = [
+  // English
+  'worksheet','exercise','exercises','problem','problems','question','questions','reading','essay','report','project','presentation','slides','slide','ppt','recite','memorize','memorise','vocabulary','vocab','word','words','homework','assignment','quiz','test','exam','review','preview','notes','diary','journal','page','pages','chapter','unit','workbook','draw','drawing','experiment','lab','video','recording','dictation','composition','translate','translation','summary','outline','flashcards','spelling','handout','packet','reflection',
+  // Chinese
+  '试卷','卷子','习题','练习册','练习','作业本','背诵','默写','听写','作文','周记','日记','报告','调查','手抄报','PPT','ppt','演讲','朗读','预习','复习','口算','计算','单词','课文','古诗','文言文','阅读','题','页','章节','单元','实验','绘画','视频','录音','导学案','学案','笔记'
+];
+
+// Submission method: canonical label + trigger keywords (English & Chinese)
+const SUBMIT_DEFS = [
+  {label:'Photo to group',  kw:['photo to the group','photo to group','send to the group','send to group','send it to the group','拍照发群','拍照上传','拍照','发群','发到群']},
+  {label:'Dictation',       kw:['dictation','默写','听写']},
+  {label:'Quiz',            kw:['quiz','测验']},
+  {label:'Check-in',        kw:['check in','check-in','打卡']},
+  {label:'Print out',       kw:['print out','printout','print','打印']},
+  {label:'Email',           kw:['email','e-mail','邮件']},
+  {label:'Hand in (paper)', kw:['hand in','hand-in','turn in','paper copy','on paper','纸质上交','纸质','上交','交到','交给']},
+  {label:'Submit online',   kw:['submit online','upload','online submission','submit','在线提交','提交','网课']},
+];
+
 const WEEKDAYS = {'一':1,'二':2,'三':3,'四':4,'五':5,'六':6,'日':0,'天':0};
+const EN_WD = {sunday:0,monday:1,tuesday:2,wednesday:3,thursday:4,friday:5,saturday:6,
+  sun:0,mon:1,tue:2,tues:2,wed:3,weds:3,thu:4,thur:4,thurs:4,fri:5,sat:6};
+const EN_MONTH = {january:0,february:1,march:2,april:3,may:4,june:5,july:6,august:7,september:8,october:9,november:10,december:11,
+  jan:0,feb:1,mar:2,apr:3,jun:5,jul:6,aug:7,sep:8,sept:8,oct:9,nov:10,dec:11};
+const FILLERS_EN = /^(hi|hey|hello|class|everyone|guys|all|ok|okay|please|pls|kindly|remember|also|and|plus|note|reminder|attention|fyi|today|tonight|tomorrow|for)\b[\s,:.\-—]*/i;
+const FILLERS_CN = /^(各位同学|同学们|大家|请|记得|另外|还有|其次|此外|以及|并且|今天|明天|后天)[\s,，、:：]*/;
 
 function pad(n){return n<10?'0'+n:''+n;}
+function isCJK(s){ return /[一-鿿]/.test(s); }
+function reEsc(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+function hasNoun(s){
+  const low=s.toLowerCase();
+  return TASK_NOUNS.some(n=> isCJK(n) ? s.includes(n) : new RegExp('\\b'+reEsc(n)+'\\b','i').test(low));
+}
 function detectSubject(t){
-  for(const s of SUBJECTS){ if(t.includes(s)) return SUBJECT_ALIAS[s]||s; }
+  const low=t.toLowerCase();
+  for(const d of SUBJECT_DEFS){
+    for(const k of d.kw){
+      if(isCJK(k)){ if(t.includes(k)) return d.name; }
+      else if(new RegExp('\\b'+reEsc(k)+'\\b','i').test(low)) return d.name;
+    }
+  }
   return '';
 }
 function detectSubmit(t){
-  for(const k of SUBMIT_KW){ if(t.includes(k)) return k; }
+  const low=t.toLowerCase();
+  for(const d of SUBMIT_DEFS){
+    for(const k of d.kw){
+      if(isCJK(k) ? t.includes(k) : low.includes(k)) return d.label;
+    }
+  }
   return '';
 }
 function detectDeadline(text, base){
+  const low = text.toLowerCase();
   const d = new Date(base.getFullYear(),base.getMonth(),base.getDate());
-  let found=false;
-  let m;
-  if(/后天/.test(text)){ d.setDate(d.getDate()+2); found=true; }
-  else if(/明天|明日/.test(text)){ d.setDate(d.getDate()+1); found=true; }
-  else if(m=text.match(/(\d{1,2})[月\.\/](\d{1,2})/)){ d.setMonth(+m[1]-1); d.setDate(+m[2]); found=true; }
-  else if(m=text.match(/(下{0,1})周[一二三四五六日天]|星期[一二三四五六日天]|礼拜[一二三四五六日天]/)){
+  let found=false, m;
+  const MON='jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?';
+  const monIdx=s=>{ s=s.replace(/\./g,''); return EN_MONTH[s]!==undefined?EN_MONTH[s]:EN_MONTH[s.slice(0,3)]; };
+  // ----- which day -----
+  if(/后天|day after tomorrow/.test(low)){ d.setDate(d.getDate()+2); found=true; }
+  else if(/明天|明日|tomorrow|tmrw|tmr/.test(low)){ d.setDate(d.getDate()+1); found=true; }
+  else if(m=low.match(/in\s+(\d{1,2})\s+days?/)){ d.setDate(d.getDate()+ +m[1]); found=true; }
+  else if(m=low.match(/(\d{1,2})\s*[月\.\/]\s*(\d{1,2})/)){ d.setMonth(+m[1]-1); d.setDate(+m[2]); found=true; }
+  else if(m=low.match(new RegExp('\\b('+MON+')\\.?\\s+(\\d{1,2})'))){ d.setMonth(monIdx(m[1])); d.setDate(+m[2]); found=true; }
+  else if(m=low.match(new RegExp('\\b(\\d{1,2})(?:st|nd|rd|th)?\\s+('+MON+')'))){ d.setMonth(monIdx(m[2])); d.setDate(+m[1]); found=true; }
+  else if(m=low.match(/(下{0,1})周[一二三四五六日天]|星期[一二三四五六日天]|礼拜[一二三四五六日天]/)){
     const wd = WEEKDAYS[m[0].slice(-1)];
     let diff = (wd - d.getDay() + 7) % 7;
     if(/下周/.test(m[0])) diff += 7;
     d.setDate(d.getDate()+diff); found=true;
   }
-  else if(/今天|今日|今晚/.test(text)){ found=true; }
-  // 时间点
+  else if(m=low.match(/\b(next\s+|this\s+)?(sunday|monday|tuesday|wednesday|thursday|friday|saturday|sun|mon|tues|tue|weds|wed|thurs|thur|thu|fri|sat)\b/)){
+    const wd = EN_WD[m[2]];
+    let diff = (wd - d.getDay() + 7) % 7;
+    if(diff===0) diff = 7;                 // bare weekday name = the next one
+    if(m[1] && /next/.test(m[1])) diff += 7;
+    d.setDate(d.getDate()+diff); found=true;
+  }
+  else if(/今天|今日|今晚|today|tonight|eod|end of day/.test(low)){ found=true; }
+  // ----- time of day -----
   let h=22,mi=0;
-  if(/早读|早自习|早晨|早上/.test(text)){h=7;mi=30;}
-  else if(/午|中午/.test(text)){h=12;mi=30;}
-  else if(/放学/.test(text)){h=17;mi=0;}
-  else if(/晚自习|晚上/.test(text)){h=19;mi=0;}
-  else if(/睡前/.test(text)){h=21;mi=0;}
-  else if(m=text.match(/(\d{1,2})[:：点](\d{0,2})/)){h=+m[1]; mi=m[2]?+m[2]:0;}
+  if(/早读|早自习|早晨|早上|before class|morning|first period/.test(low)){h=7;mi=30;}
+  else if(/中午|午|noon|midday|lunch/.test(low)){h=12;mi=30;}
+  else if(/放学|after school|end of school/.test(low)){h=17;mi=0;}
+  else if(/晚自习|晚上|evening|study hall|tonight/.test(low)){h=19;mi=0;}
+  else if(/睡前|before bed|bedtime/.test(low)){h=21;mi=0;}
+  else if(m=low.match(/\b(\d{1,2})(?::(\d{2}))?\s*(a\.?m\.?|p\.?m\.?)/)){ h=+m[1]%12; if(/p/.test(m[3])) h+=12; mi=m[2]?+m[2]:0; }
+  else if(m=low.match(/(\d{1,2})[:：点](\d{0,2})/)){ h=+m[1]; mi=m[2]?+m[2]:0; }
   d.setHours(h,mi,0,0);
   return {date:d, found};
 }
 function extractContent(piece){
   const segs = piece.split(/[，,、；;]/).map(s=>s.trim()).filter(Boolean);
-  let pick = segs.find(s=>TASK_NOUNS.some(n=>s.includes(n))) || segs[0] || piece;
-  pick = pick.replace(/^(各位同学|同学们|大家|请|记得|另外|还有|其次|此外|以及|并且|今天|明天|后天)/,'');
-  for(const s of SUBJECTS){ pick = pick.replace(new RegExp('^'+s+'(科){0,1}(的){0,1}'),''); }
-  pick = pick.replace(/^(作业是|作业[:：]|的作业|作业)/,'').replace(/[。.，,；;的了]$/,'').trim();
-  return pick || piece;
+  let pick = segs.find(s=>hasNoun(s)) || segs[0] || piece;
+  // strip leading fillers (possibly stacked)
+  let prev;
+  do { prev=pick; pick = pick.replace(FILLERS_EN,'').replace(FILLERS_CN,''); } while(pick!==prev && pick);
+  // strip a leading subject name
+  for(const dfn of SUBJECT_DEFS){
+    for(const k of dfn.kw){
+      if(isCJK(k)) pick = pick.replace(new RegExp('^'+k+'(科)?(的)?'),'');
+      else if(!k.includes('.')) pick = pick.replace(new RegExp('^'+reEsc(k)+"['’]?s?\\b[:\\s]*",'i'),'');
+    }
+  }
+  pick = pick.replace(/^(hw|homework|assignment|task)\b(\s+(is|are))?[:\s]*/i,'');
+  pick = pick.replace(/^(作业是|作业[:：]|的作业|作业)/,'');
+  pick = pick.replace(/\s*\b(due|deadline)\b.*$/i,'');     // drop trailing "due ..."
+  pick = pick.replace(/[。.，,；;、的了\s]+$/,'').trim();
+  if(/^[a-z]/.test(pick)) pick = pick.charAt(0).toUpperCase()+pick.slice(1);
+  return pick || piece.trim();
 }
 function parseHomework(text, base){
-  const pieces = text.split(/[\n。!！?？]+/).map(s=>s.trim()).filter(s=>s.length>=3);
+  const pieces = text.split(/\n+|[。！？；;]+|[.!?]+\s+/).map(s=>s.trim()).filter(s=>s.length>=3);
   const out=[];
   for(const p of pieces){
     const subject = detectSubject(p);
-    const content = extractContent(p);
-    if(!subject && !TASK_NOUNS.some(n=>p.includes(n))) continue;
+    if(!subject && !hasNoun(p)) continue;
     const dl = detectDeadline(p, base);
     out.push({
       id:'r'+Math.random().toString(36).slice(2,8),
-      subject: subject||'其他',
-      content,
+      subject: subject||'Other',
+      content: extractContent(p),
       deadline: toLocalInput(dl.date),
       submit: detectSubmit(p)
     });
@@ -488,18 +580,18 @@ createApp({
     const loginRole = ref('');
     const tab = ref('home');
     const user = reactive({name:'', role:'student'});
-    const childName = ref('小林');
+    const childName = ref('Alex');
     const tasks = ref([]);
     const groups = ref([]);
     const scanInput = ref('');
     const scanResults = ref([]);
     const scanned = ref(false);
     const showGroupSheet = ref(false);
-    const memberPool = ['小林','小王','小李','小张','小赵','小陈'];
-    const gForm = reactive({title:'',deadline:'',members:['小林'],subtasks:[{owner:'小林',content:'',deadline:''}]});
+    const memberPool = ['Alex','Sam','Jamie','Taylor','Jordan','Casey'];
+    const gForm = reactive({title:'',deadline:'',members:['Alex'],subtasks:[{owner:'Alex',content:'',deadline:''}]});
 
     const isParent = computed(()=>user.role==='parent');
-    const subjectList = ['语文','数学','英语','物理','化学','生物','政治','历史','地理','道德与法治','科学','体育','音乐','美术','信息技术','其他'];
+    const subjectList = SUBJECT_DEFS.map(d=>d.name).concat(['Other']);
 
     // ---- persistence ----
     function save(){
@@ -524,19 +616,19 @@ createApp({
       const now = new Date();
       const mk=(off,h,mi)=>{const d=new Date(now.getFullYear(),now.getMonth(),now.getDate()+off,h,mi);return d.toISOString();};
       tasks.value = [
-        {id:'t1',subject:'数学',content:'试卷第3-5页',deadline:mk(0,22,0),submit:'拍照发群',done:false},
-        {id:'t2',subject:'英语',content:'背诵 Unit 5 单词',deadline:mk(1,7,30),submit:'课堂听写',done:false},
-        {id:'t3',subject:'物理',content:'实验报告《自由落体》',deadline:mk(2,22,0),submit:'纸质上交',done:false},
-        {id:'t4',subject:'语文',content:'周记一篇',deadline:mk(-1,22,0),submit:'交语文课代表',done:false},
-        {id:'t5',subject:'化学',content:'课后习题 P42',deadline:mk(3,19,0),submit:'',done:true},
+        {id:'t1',subject:'Math',content:'Worksheet pages 3-5',deadline:mk(0,22,0),submit:'Photo to group',done:false},
+        {id:'t2',subject:'English',content:'Recite Unit 5 vocabulary',deadline:mk(1,7,30),submit:'Dictation',done:false},
+        {id:'t3',subject:'Physics',content:'Lab report: Free Fall',deadline:mk(2,22,0),submit:'Hand in (paper)',done:false},
+        {id:'t4',subject:'Chinese',content:'Write a weekly journal',deadline:mk(-1,22,0),submit:'Hand in (paper)',done:false},
+        {id:'t5',subject:'Chemistry',content:'Textbook exercises p.42',deadline:mk(3,19,0),submit:'',done:true},
       ];
       groups.value = [{
-        id:'g1', title:'历史小组PPT《丝绸之路》', deadline:mk(7,18,0),
+        id:'g1', title:'History group PPT: The Silk Road', deadline:mk(7,18,0),
         subtasks:[
-          {id:'s1',owner:'小林',content:'查资料·整理史料',deadline:mk(2,18,0),status:'done'},
-          {id:'s2',owner:'小王',content:'制作PPT',deadline:mk(4,18,0),status:'doing'},
-          {id:'s3',owner:'小李',content:'撰写讲稿',deadline:mk(5,18,0),status:'todo'},
-          {id:'s4',owner:'小张',content:'搜集配图',deadline:mk(-1,18,0),status:'todo'},
+          {id:'s1',owner:'Alex',content:'Research & gather sources',deadline:mk(2,18,0),status:'done'},
+          {id:'s2',owner:'Sam',content:'Build the slides',deadline:mk(4,18,0),status:'doing'},
+          {id:'s3',owner:'Jamie',content:'Write the script',deadline:mk(5,18,0),status:'todo'},
+          {id:'s4',owner:'Taylor',content:'Collect images',deadline:mk(-1,18,0),status:'todo'},
         ]
       }];
     }
@@ -549,29 +641,32 @@ createApp({
       screen.value='main'; tab.value='home';
     }
     function switchRole(){ user.role = isParent.value ? 'student':'parent'; if(isParent.value) tab.value='home'; }
-    function resetAll(){ if(confirm('确定清空所有作业和小组数据？')){ localStorage.removeItem(STORE_KEY); location.reload(); } }
+    function resetAll(){ if(confirm('Clear all homework and group data?')){ localStorage.removeItem(STORE_KEY); location.reload(); } }
 
     // ---- date helpers ----
+    const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
     const todayText = computed(()=>{
-      const d=new Date(); const w='日一二三四五六'[d.getDay()];
-      return `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日 星期${w}`;
+      const d=new Date();
+      return `${DAYS[d.getDay()]}, ${MONTHS[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
     });
-    const greeting = computed(()=>{const h=new Date().getHours();return h<6?'凌晨好':h<11?'早上好':h<13?'中午好':h<18?'下午好':'晚上好';});
+    const greeting = computed(()=>{const h=new Date().getHours();return h<12?'Good morning':h<18?'Good afternoon':'Good evening';});
+    function timeStr(d){ let h=d.getHours(); const ap=h<12?'AM':'PM'; let hh=h%12; if(hh===0)hh=12; return hh+':'+pad(d.getMinutes())+' '+ap; }
     function isOverdue(t){ return new Date(t.deadline) < new Date(); }
     function formatDL(iso,t){
       const d=new Date(iso), now=new Date();
       const day0=new Date(now.getFullYear(),now.getMonth(),now.getDate());
       const dd=new Date(d.getFullYear(),d.getMonth(),d.getDate());
       const diff=Math.round((dd-day0)/86400000);
-      const hm=pad(d.getHours())+':'+pad(d.getMinutes());
+      const hm=timeStr(d);
       let s;
-      if(diff===0) s='今天 '+hm; else if(diff===1) s='明天 '+hm; else if(diff===2) s='后天 '+hm;
-      else if(diff>2&&diff<7) s='周'+'日一二三四五六'[d.getDay()]+' '+hm;
-      else s=(d.getMonth()+1)+'月'+d.getDate()+'日 '+hm;
-      if(t && !t.done && d<now) s='已逾期 · '+s;
+      if(diff===0) s='Today '+hm; else if(diff===1) s='Tomorrow '+hm; else if(diff===2) s='In 2 days '+hm;
+      else if(diff>2&&diff<7) s=DAYS[d.getDay()].slice(0,3)+' '+hm;
+      else s=MONTHS[d.getMonth()]+' '+d.getDate()+' '+hm;
+      if(t && !t.done && d<now) s='Overdue · '+s;
       return s;
     }
-    function formatDate(iso){const d=new Date(iso);return (d.getMonth()+1)+'月'+d.getDate()+'日';}
+    function formatDate(iso){const d=new Date(iso);return MONTHS[d.getMonth()]+' '+d.getDate();}
     function dlClass(t){ if(t.done) return ''; const d=new Date(t.deadline),now=new Date();
       if(d<now) return 'over'; if((d-now)<86400000) return 'soon'; return ''; }
 
@@ -594,12 +689,13 @@ createApp({
     function toggleDone(t){ t.done=!t.done; }
 
     // ---- styles ----
-    function pillStyle(s){const c=SUBJECT_COLORS[s]||SUBJECT_COLORS['其他'];return {background:c[0],color:c[1]};}
+    function pillStyle(s){const c=SUBJECT_COLORS[s]||SUBJECT_COLORS['Other'];return {background:c[0],color:c[1]};}
     function avatarColor(name){const colors=['#5B6CF6','#1A9E5B','#E8852B','#D6469A','#0E9AA7','#8B5CF6'];
       let h=0;for(const ch of name)h+=ch.charCodeAt(0);return colors[h%colors.length];}
+    function initials(name){ if(!name) return '?'; const p=name.trim().split(/\s+/); return p.map(x=>x[0]).join('').slice(0,2).toUpperCase(); }
 
     // ---- scan ----
-    function fillSample(){ scanInput.value='各位同学，今天数学作业是试卷第3-5页，明天早读前交，记得拍照发群里。\n另外语文背诵《岳阳楼记》全文，周五默写。'; }
+    function fillSample(){ scanInput.value="Math worksheet pages 3-5, due tomorrow before class — take a photo and send to the group.\nEnglish: recite Unit 5 vocabulary, quiz this Friday.\nPhysics lab report on Free Fall, due May 8."; }
     function doScan(){ scanned.value=true; scanResults.value = parseHomework(scanInput.value, new Date()); }
     function confirmScan(){
       for(const r of scanResults.value){
@@ -613,13 +709,13 @@ createApp({
     function doneCount(g){return g.subtasks.filter(s=>s.status==='done').length;}
     function groupProgress(g){return g.subtasks.length?Math.round(doneCount(g)/g.subtasks.length*100):0;}
     function effStatus(st){ if(st.status!=='done' && new Date(st.deadline)<new Date()) return 'overdue'; return st.status; }
-    function statusLabel(s){return {todo:'未开始',doing:'进行中',done:'已完成',overdue:'已逾期'}[s];}
+    function statusLabel(s){return {todo:'To do',doing:'Doing',done:'Done',overdue:'Overdue'}[s];}
     function cycleStatus(st){ const order=['todo','doing','done']; let i=order.indexOf(st.status); st.status=order[(i+1)%3]; }
-    function openGroupSheet(){ gForm.title='';gForm.deadline='';gForm.members=['小林'];gForm.subtasks=[{owner:'小林',content:'',deadline:''}]; showGroupSheet.value=true; }
-    function toggleMember(m){ const i=gForm.members.indexOf(m); if(i>=0){if(m!=='小林')gForm.members.splice(i,1);} else gForm.members.push(m); }
-    function addSub(){ gForm.subtasks.push({owner:gForm.members[0]||'小林',content:'',deadline:gForm.deadline}); }
+    function openGroupSheet(){ gForm.title='';gForm.deadline='';gForm.members=['Alex'];gForm.subtasks=[{owner:'Alex',content:'',deadline:''}]; showGroupSheet.value=true; }
+    function toggleMember(m){ const i=gForm.members.indexOf(m); if(i>=0){if(m!=='Alex')gForm.members.splice(i,1);} else gForm.members.push(m); }
+    function addSub(){ gForm.subtasks.push({owner:gForm.members[0]||'Alex',content:'',deadline:gForm.deadline}); }
     function saveGroup(){
-      if(!gForm.title){alert('请填写任务名称');return;}
+      if(!gForm.title){alert('Please enter a task name');return;}
       groups.value.push({
         id:'g'+Math.random().toString(36).slice(2,8), title:gForm.title,
         deadline: gForm.deadline?new Date(gForm.deadline+'T18:00').toISOString():new Date().toISOString(),
@@ -632,14 +728,14 @@ createApp({
       showGroupSheet.value=false;
     }
 
-    const tabTitle = computed(()=>({home:'AI课代表',scan:'智能识别',group:'小组任务',me:'我的'}[tab.value]));
+    const tabTitle = computed(()=>({home:'Task Tamer',scan:'Smart Detect',group:'Group Tasks',me:'Me'}[tab.value]));
 
     onMounted(load);
 
     return {screen,loginName,loginRole,tab,user,childName,tasks,groups,scanInput,scanResults,scanned,
       showGroupSheet,memberPool,gForm,isParent,subjectList,
       doLogin,switchRole,resetAll,todayText,greeting,isOverdue,formatDL,formatDate,dlClass,
-      sortedTasks,todayCount,stat,toggleDone,pillStyle,avatarColor,
+      sortedTasks,todayCount,stat,toggleDone,pillStyle,avatarColor,initials,
       fillSample,doScan,confirmScan,doneCount,groupProgress,effStatus,statusLabel,cycleStatus,
       openGroupSheet,toggleMember,addSub,saveGroup,tabTitle};
   }
